@@ -1,0 +1,61 @@
+body {
+    background-color: #1E1E1E;
+    color: #E6E6E6;
+
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.35;
+    max-width: 1200px;
+}
+
+#headerContainer {
+
+}
+
+#bodyContainer {
+
+}
+
+#footerContainer {
+
+}
+
+.tab.model {
+    width: 25%;
+    height: 50px;
+    color: rgb(240, 240, 240);
+    background-color: #1E1E1E;
+    border-radius: 0;
+    border-style: solid;
+    border-color: #1E1E1E;
+    border-width: 2px;
+    float: left;
+    outline: none;
+    cursor: pointer;
+    padding: auto;
+    font-size: 18px;
+    
+    margin: 0;
+}
+
+.tab.model:hover {
+    background-color: rgb(50, 50, 50);
+    border-color: rgb(50, 50, 50);
+}
+
+.tab.model.downloading{
+    border-color: rgb(175, 175, 80);
+    cursor: progress;
+}
+
+
+.tab.model.downloaded {
+    border-color: #1EB4F0;
+    background-color: #1E1E1E;;
+    /* #1E1E1E; */
+}
+
+.tab.model.downloaded.active {
+    background-color: #1EB4F0;
+    cursor: default;
+}
