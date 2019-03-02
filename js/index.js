@@ -559,7 +559,7 @@ function setActiveModel(button) {
 
     for (let i = 0; i < modelNames.length; i++) {
 
-        let modelPath = './models/' + modelNames[i] + '_tfjs/model.json';
+        let modelPath = '../models/' + modelNames[i] + '_tfjs/model.json';
         let modelButton = document.getElementById(modelNames[i]);
 
         //Set up model Buttons
