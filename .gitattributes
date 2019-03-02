@@ -1,1 +1,2 @@
-models filter=lfs diff=lfs merge=lfs -text
+# This will add all the binary shards to git LFS instead of the main repo
+models/**/group* filter=lfs diff=lfs merge=lfs -text
