@@ -1,55 +1,46 @@
 <!-- Served @ https://terragrid.z5.web.core.windows.net/ -->
 
-<!DOCTYPE html>
+<!-- <!DOCTYPE html> -->
 <html lang="en">
 
 <head>
     <link rel="stylesheet" href="./css/index.css">
-
-    <!-- Load React. -->
-    <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
-    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
-
-
-    <!-- Tensorflow -->
-    <script src='./lib/tf.min.js'></script>
-
+    <script src='./js/index.js'></script>
 </head>
 
 <body>
+    <div id='imageContainer'></div>
+    <div id='testContainer'></div>
+    <div id='bodyContainer'></div>
+        <script>
+            window.terraGrid.init();
+        </script>
     <!-- Header -->
-    <div id='headerContainer'>
-        <button class='tab model' id='256_grid8_bin'>256_grid8_bin</button>
+    <!-- <div id='headerContainer'> -->
+        <!-- <button class='tab model' id='256_grid8_bin'>256_grid8_bin</button>
         <button class='tab model' id='256_grid8_grad'>256_grid8_grad</button>
         <button class='tab model' id='256_grid16_bin'>256_grid16_bin</button>
-        <button class='tab model' id='256_grid16_grad'>256_grid16_grad</button>
-    </div>
+        <button class='tab model' id='256_grid16_grad'>256_grid16_grad</button> -->
+    <!-- </div> -->
 
     <!-- Body -->
-    <div id='bodyContainer'>
-        <div id='inputGridContainer'>
-            <div id="like_button_container"></div>
-            <div id="INPUT_container"></div>
+    <!-- <div id='bodyContainer'> -->
+        <!-- <div id='inputGridContainer'>
 
         </div>
+
         <div id='resultImageContainer'>
 
         </div>
+
         <div id='inputGridContainer'>
 
-        </div>
-
-    </div>
+        </div> -->
+    <!-- </div> -->
 
     <!-- Footer -->
-    <div id='footerContainer'>
+    <!-- <div id='footerContainer'> -->
 
-    </div>
+    <!-- </div> -->
 
-    <!-- Load our React component. -->
-    <script src="./js/terraCanvas.js"></script>
-    <script src="./js/like_button.js"></script>
-
-    <script src='./js/index.js'></script>
 </body>

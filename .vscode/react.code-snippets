@@ -19,10 +19,10 @@
 
 	// Create a new React Component
 	"Create a new react component class": {
-			"scope": "javascript,typescript",
+			"scope": "javascript,typescript, javascriptreact",
 			"prefix": "react component",
 			"body": [
-				"class $1 extends React.Component {",
+				"export class $1 extends React.Component {",
 				"    constructor(props) {",
 				"        super(props);",
 				"        this.state = { $2 };",
