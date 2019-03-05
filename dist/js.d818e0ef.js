@@ -33198,9 +33198,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.TopoViewer = void 0;
 
-var Three = _interopRequireWildcard(require("three"));
-
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
+var _three = require("three");
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -33208,13 +33206,13 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-Three.OrbitControls = function (object, domElement) {
+var OrbitControls = function OrbitControls(object, domElement) {
   this.object = object;
   this.domElement = domElement !== undefined ? domElement : document; // Set to false to disable this control
 
   this.enabled = true; // "target" sets the location of focus, where the object orbits around
 
-  this.target = new Three.Vector3(); // How far you can dolly in and out ( PerspectiveCamera only )
+  this.target = new _three.Vector3(); // How far you can dolly in and out ( PerspectiveCamera only )
 
   this.minDistance = 0;
   this.maxDistance = Infinity; // How far you can zoom in and out ( OrthographicCamera only )
@@ -33267,9 +33265,9 @@ Three.OrbitControls = function (object, domElement) {
   }; // Mouse buttons
 
   this.mouseButtons = {
-    LEFT: Three.MOUSE.LEFT,
-    MIDDLE: Three.MOUSE.MIDDLE,
-    RIGHT: Three.MOUSE.RIGHT
+    LEFT: _three.MOUSE.LEFT,
+    MIDDLE: _three.MOUSE.MIDDLE,
+    RIGHT: _three.MOUSE.RIGHT
   }; // for reset
 
   this.target0 = this.target.clone();
@@ -33304,12 +33302,12 @@ Three.OrbitControls = function (object, domElement) {
 
 
   this.update = function () {
-    var offset = new Three.Vector3(); // so camera.up is the orbit axis
+    var offset = new _three.Vector3(); // so camera.up is the orbit axis
 
-    var quat = new Three.Quaternion().setFromUnitVectors(object.up, new Three.Vector3(0, 1, 0));
+    var quat = new _three.Quaternion().setFromUnitVectors(object.up, new _three.Vector3(0, 1, 0));
     var quatInverse = quat.clone().inverse();
-    var lastPosition = new Three.Vector3();
-    var lastQuaternion = new Three.Quaternion();
+    var lastPosition = new _three.Vector3();
+    var lastQuaternion = new _three.Quaternion();
     return function update() {
       var position = scope.object.position;
       offset.copy(position).sub(scope.target); // rotate offset to "y-axis-is-up" space
@@ -33401,20 +33399,20 @@ Three.OrbitControls = function (object, domElement) {
   var state = STATE.NONE;
   var EPS = 0.000001; // current position in spherical coordinates
 
-  var spherical = new Three.Spherical();
-  var sphericalDelta = new Three.Spherical();
+  var spherical = new _three.Spherical();
+  var sphericalDelta = new _three.Spherical();
   var scale = 1;
-  var panOffset = new Three.Vector3();
+  var panOffset = new _three.Vector3();
   var zoomChanged = false;
-  var rotateStart = new Three.Vector2();
-  var rotateEnd = new Three.Vector2();
-  var rotateDelta = new Three.Vector2();
-  var panStart = new Three.Vector2();
-  var panEnd = new Three.Vector2();
-  var panDelta = new Three.Vector2();
-  var dollyStart = new Three.Vector2();
-  var dollyEnd = new Three.Vector2();
-  var dollyDelta = new Three.Vector2();
+  var rotateStart = new _three.Vector2();
+  var rotateEnd = new _three.Vector2();
+  var rotateDelta = new _three.Vector2();
+  var panStart = new _three.Vector2();
+  var panEnd = new _three.Vector2();
+  var panDelta = new _three.Vector2();
+  var dollyStart = new _three.Vector2();
+  var dollyEnd = new _three.Vector2();
+  var dollyDelta = new _three.Vector2();
 
   function getAutoRotationAngle() {
     return 2 * Math.PI / 60 / 60 * scope.autoRotateSpeed;
@@ -33433,7 +33431,7 @@ Three.OrbitControls = function (object, domElement) {
   }
 
   var panLeft = function () {
-    var v = new Three.Vector3();
+    var v = new _three.Vector3();
     return function panLeft(distance, objectMatrix) {
       v.setFromMatrixColumn(objectMatrix, 0); // get X column of objectMatrix
 
@@ -33443,7 +33441,7 @@ Three.OrbitControls = function (object, domElement) {
   }();
 
   var panUp = function () {
-    var v = new Three.Vector3();
+    var v = new _three.Vector3();
     return function panUp(distance, objectMatrix) {
       if (scope.screenSpacePanning === true) {
         v.setFromMatrixColumn(objectMatrix, 1);
@@ -33459,7 +33457,7 @@ Three.OrbitControls = function (object, domElement) {
 
 
   var pan = function () {
-    var offset = new Three.Vector3();
+    var offset = new _three.Vector3();
     return function pan(deltaX, deltaY) {
       var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
 
@@ -33836,73 +33834,73 @@ Three.OrbitControls = function (object, domElement) {
   this.update();
 };
 
-Three.OrbitControls.prototype = Object.create(Three.EventDispatcher.prototype);
-Three.OrbitControls.prototype.constructor = Three.OrbitControls;
-Object.defineProperties(Three.OrbitControls.prototype, {
+OrbitControls.prototype = Object.create(_three.EventDispatcher.prototype);
+OrbitControls.prototype.constructor = OrbitControls;
+Object.defineProperties(OrbitControls.prototype, {
   center: {
     get: function get() {
-      console.warn('Three.OrbitControls: .center has been renamed to .target');
+      console.warn('OrbitControls: .center has been renamed to .target');
       return this.target;
     }
   },
   // backward compatibility
   noZoom: {
     get: function get() {
-      console.warn('Three.OrbitControls: .noZoom has been deprecated. Use .enableZoom instead.');
+      console.warn('OrbitControls: .noZoom has been deprecated. Use .enableZoom instead.');
       return !this.enableZoom;
     },
     set: function set(value) {
-      console.warn('Three.OrbitControls: .noZoom has been deprecated. Use .enableZoom instead.');
+      console.warn('OrbitControls: .noZoom has been deprecated. Use .enableZoom instead.');
       this.enableZoom = !value;
     }
   },
   noRotate: {
     get: function get() {
-      console.warn('Three.OrbitControls: .noRotate has been deprecated. Use .enableRotate instead.');
+      console.warn('OrbitControls: .noRotate has been deprecated. Use .enableRotate instead.');
       return !this.enableRotate;
     },
     set: function set(value) {
-      console.warn('Three.OrbitControls: .noRotate has been deprecated. Use .enableRotate instead.');
+      console.warn('OrbitControls: .noRotate has been deprecated. Use .enableRotate instead.');
       this.enableRotate = !value;
     }
   },
   noPan: {
     get: function get() {
-      console.warn('Three.OrbitControls: .noPan has been deprecated. Use .enablePan instead.');
+      console.warn('OrbitControls: .noPan has been deprecated. Use .enablePan instead.');
       return !this.enablePan;
     },
     set: function set(value) {
-      console.warn('Three.OrbitControls: .noPan has been deprecated. Use .enablePan instead.');
+      console.warn('OrbitControls: .noPan has been deprecated. Use .enablePan instead.');
       this.enablePan = !value;
     }
   },
   noKeys: {
     get: function get() {
-      console.warn('Three.OrbitControls: .noKeys has been deprecated. Use .enableKeys instead.');
+      console.warn('OrbitControls: .noKeys has been deprecated. Use .enableKeys instead.');
       return !this.enableKeys;
     },
     set: function set(value) {
-      console.warn('Three.OrbitControls: .noKeys has been deprecated. Use .enableKeys instead.');
+      console.warn('OrbitControls: .noKeys has been deprecated. Use .enableKeys instead.');
       this.enableKeys = !value;
     }
   },
   staticMoving: {
     get: function get() {
-      console.warn('Three.OrbitControls: .staticMoving has been deprecated. Use .enableDamping instead.');
+      console.warn('OrbitControls: .staticMoving has been deprecated. Use .enableDamping instead.');
       return !this.enableDamping;
     },
     set: function set(value) {
-      console.warn('Three.OrbitControls: .staticMoving has been deprecated. Use .enableDamping instead.');
+      console.warn('OrbitControls: .staticMoving has been deprecated. Use .enableDamping instead.');
       this.enableDamping = !value;
     }
   },
   dynamicDampingFactor: {
     get: function get() {
-      console.warn('Three.OrbitControls: .dynamicDampingFactor has been renamed. Use .dampingFactor instead.');
+      console.warn('OrbitControls: .dynamicDampingFactor has been renamed. Use .dampingFactor instead.');
       return this.dampingFactor;
     },
     set: function set(value) {
-      console.warn('Three.OrbitControls: .dynamicDampingFactor has been renamed. Use .dampingFactor instead.');
+      console.warn('OrbitControls: .dynamicDampingFactor has been renamed. Use .dampingFactor instead.');
       this.dampingFactor = value;
     }
   }
@@ -33935,16 +33933,16 @@ function () {
     this.worldHalfWidth = this.worldWidth / 2;
     this.worldHalfDepth = this.worldDepth / 2; // SCENE SETUP
 
-    this.scene = new Three.Scene();
-    this.scene.background = new Three.Color(this.backgroundColor); // CAMERA SETUP
+    this.scene = new _three.Scene();
+    this.scene.background = new _three.Color(this.backgroundColor); // CAMERA SETUP
 
-    this.camera = new Three.PerspectiveCamera(60, this.width / this.height, 10, 20000); // RENDERER SETUP
+    this.camera = new _three.PerspectiveCamera(60, this.width / this.height, 10, 20000); // RENDERER SETUP
 
-    this.renderer = new Three.WebGLRenderer();
+    this.renderer = new _three.WebGLRenderer();
     this.renderer.setSize(this.width, this.height);
     this.container.appendChild(this.renderer.domElement); // CONTROL SETUP
 
-    this.controls = new Three.OrbitControls(this.camera, this.renderer.domElement);
+    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.minDistance = 100;
     this.controls.maxDistance = 10000;
     this.controls.maxPolarAngle = Math.PI / 2; // UPDATE CAMERA POSITION
@@ -33957,15 +33955,15 @@ function () {
     // this.mouse = new Three.Vector2();
     // PLANE GEOMETRY
 
-    this.geometry = new Three.PlaneBufferGeometry(this.planeWidth, this.planeHeight, this.worldWidth - 1, this.worldDepth - 1);
+    this.geometry = new _three.PlaneBufferGeometry(this.planeWidth, this.planeHeight, this.worldWidth - 1, this.worldDepth - 1);
     this.geometry.attributes.position.dynamic = true;
     this.geometry.rotateX(-Math.PI / 2); // TEXTURE
 
-    this.texture1 = new Three.TextureLoader().load(this.textureURL); // MATERIAL
+    this.texture1 = new _three.TextureLoader().load(this.textureURL); // MATERIAL
 
     this.materials = [];
-    this.materials.push(new Three.MeshNormalMaterial());
-    this.materials.push(new Three.MeshBasicMaterial({
+    this.materials.push(new _three.MeshNormalMaterial());
+    this.materials.push(new _three.MeshBasicMaterial({
       map: this.texture1
     }));
     this.currMaterial = 0;
@@ -33981,7 +33979,7 @@ function () {
     }; // MESH
 
 
-    this.mesh = new Three.Mesh(this.geometry, this.material);
+    this.mesh = new _three.Mesh(this.geometry, this.material);
     this.scene.add(this.mesh); // ANNIMATION
 
     this.animate = function () {
@@ -34058,8 +34056,8 @@ function () {
     value: function generateBakedTexture(data, width, height) {
       // bake lighting into texture
       var canvas, canvasScaled, context, image, imageData, vector3, sun, shade;
-      vector3 = new Three.Vector3(0, 0, 0);
-      sun = new Three.Vector3(1, 1, 1);
+      vector3 = new _three.Vector3(0, 0, 0);
+      sun = new _three.Vector3(1, 1, 1);
       sun.normalize();
       canvas = document.createElement('canvas');
       canvas.width = width;
@@ -34110,13 +34108,13 @@ function () {
       var texture;
 
       if (this.isBakedLighting) {
-        texture = new Three.CanvasTexture(this.generateBakedTexture(data, this.worldWidth, this.worldDepth));
+        texture = new _three.CanvasTexture(this.generateBakedTexture(data, this.worldWidth, this.worldDepth));
       } else {
-        texture = new Three.Texture(image);
+        texture = new _three.Texture(image);
       }
 
-      texture.wrapS = Three.ClampToEdgeWrapping;
-      texture.wrapT = Three.ClampToEdgeWrapping;
+      texture.wrapS = _three.ClampToEdgeWrapping;
+      texture.wrapT = _three.ClampToEdgeWrapping;
       return texture;
     } // Updates the Model Geometry and Rendering
 
@@ -34146,7 +34144,10 @@ function () {
   }]);
 
   return TopoViewer;
-}();
+}(); // function newFunction() {
+//     return *;
+// }
+
 
 exports.TopoViewer = TopoViewer;
 },{"three":"node_modules/three/build/three.module.js"}],"src/js/GridPainter.js":[function(require,module,exports) {
@@ -34735,7 +34736,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "59141" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61126" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

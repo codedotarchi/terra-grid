@@ -7,11 +7,8 @@
     "lib": "lib"
   },
   "dependencies": {
-    "@tensorflow/tfjs": "github:tensorflow/tfjs",
-    "react": "^16.8.3",
-    "react-dom": "^16.8.3",
-    "three": "^0.102.1",
-    "typescript": "^3.3.3333"
+    "@tensorflow/tfjs": "^0.15.3",
+    "three": "^0.102.1"
   },
   "devDependencies": {
     "parcel-bundler": "^1.11.0"

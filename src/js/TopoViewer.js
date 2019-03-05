@@ -1,6 +1,6 @@
-import * as Three from 'three';
+import { Scene, Vector2, Vector3, MOUSE, Quaternion, Spherical, Color, PerspectiveCamera, WebGLRenderer, PlaneBufferGeometry, TextureLoader, MeshNormalMaterial, MeshBasicMaterial, Mesh, ClampToEdgeWrapping, CanvasTexture, Texture, EventDispatcher } from 'three';
 
-Three.OrbitControls = function (object, domElement) {
+var OrbitControls = function (object, domElement) {
 
     this.object = object;
 
@@ -10,7 +10,7 @@ Three.OrbitControls = function (object, domElement) {
     this.enabled = true;
 
     // "target" sets the location of focus, where the object orbits around
-    this.target = new Three.Vector3();
+    this.target = new Vector3();
 
     // How far you can dolly in and out ( PerspectiveCamera only )
     this.minDistance = 0;
@@ -62,7 +62,7 @@ Three.OrbitControls = function (object, domElement) {
     this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
 
     // Mouse buttons
-    this.mouseButtons = { LEFT: Three.MOUSE.LEFT, MIDDLE: Three.MOUSE.MIDDLE, RIGHT: Three.MOUSE.RIGHT };
+    this.mouseButtons = { LEFT: MOUSE.LEFT, MIDDLE: MOUSE.MIDDLE, RIGHT: MOUSE.RIGHT };
 
     // for reset
     this.target0 = this.target.clone();
@@ -111,14 +111,14 @@ Three.OrbitControls = function (object, domElement) {
     // this method is exposed, but perhaps it would be better if we can make it private...
     this.update = function () {
 
-        var offset = new Three.Vector3();
+        var offset = new Vector3();
 
         // so camera.up is the orbit axis
-        var quat = new Three.Quaternion().setFromUnitVectors(object.up, new Three.Vector3(0, 1, 0));
+        var quat = new Quaternion().setFromUnitVectors(object.up, new Vector3(0, 1, 0));
         var quatInverse = quat.clone().inverse();
 
-        var lastPosition = new Three.Vector3();
-        var lastQuaternion = new Three.Quaternion();
+        var lastPosition = new Vector3();
+        var lastQuaternion = new Quaternion();
 
         return function update() {
 
@@ -244,24 +244,24 @@ Three.OrbitControls = function (object, domElement) {
     var EPS = 0.000001;
 
     // current position in spherical coordinates
-    var spherical = new Three.Spherical();
-    var sphericalDelta = new Three.Spherical();
+    var spherical = new Spherical();
+    var sphericalDelta = new Spherical();
 
     var scale = 1;
-    var panOffset = new Three.Vector3();
+    var panOffset = new Vector3();
     var zoomChanged = false;
 
-    var rotateStart = new Three.Vector2();
-    var rotateEnd = new Three.Vector2();
-    var rotateDelta = new Three.Vector2();
+    var rotateStart = new Vector2();
+    var rotateEnd = new Vector2();
+    var rotateDelta = new Vector2();
 
-    var panStart = new Three.Vector2();
-    var panEnd = new Three.Vector2();
-    var panDelta = new Three.Vector2();
+    var panStart = new Vector2();
+    var panEnd = new Vector2();
+    var panDelta = new Vector2();
 
-    var dollyStart = new Three.Vector2();
-    var dollyEnd = new Three.Vector2();
-    var dollyDelta = new Three.Vector2();
+    var dollyStart = new Vector2();
+    var dollyEnd = new Vector2();
+    var dollyDelta = new Vector2();
 
     function getAutoRotationAngle() {
 
@@ -289,7 +289,7 @@ Three.OrbitControls = function (object, domElement) {
 
     var panLeft = function () {
 
-        var v = new Three.Vector3();
+        var v = new Vector3();
 
         return function panLeft(distance, objectMatrix) {
 
@@ -304,7 +304,7 @@ Three.OrbitControls = function (object, domElement) {
 
     var panUp = function () {
 
-        var v = new Three.Vector3();
+        var v = new Vector3();
 
         return function panUp(distance, objectMatrix) {
 
@@ -330,7 +330,7 @@ Three.OrbitControls = function (object, domElement) {
     // deltaX and deltaY are in pixels; right and down are positive
     var pan = function () {
 
-        var offset = new Three.Vector3();
+        var offset = new Vector3();
 
         return function pan(deltaX, deltaY) {
 
@@ -920,16 +920,16 @@ Three.OrbitControls = function (object, domElement) {
 
 };
 
-Three.OrbitControls.prototype = Object.create(Three.EventDispatcher.prototype);
-Three.OrbitControls.prototype.constructor = Three.OrbitControls;
+OrbitControls.prototype = Object.create(EventDispatcher.prototype);
+OrbitControls.prototype.constructor = OrbitControls;
 
-Object.defineProperties(Three.OrbitControls.prototype, {
+Object.defineProperties(OrbitControls.prototype, {
 
     center: {
 
         get: function () {
 
-            console.warn('Three.OrbitControls: .center has been renamed to .target');
+            console.warn('OrbitControls: .center has been renamed to .target');
             return this.target;
 
         }
@@ -942,14 +942,14 @@ Object.defineProperties(Three.OrbitControls.prototype, {
 
         get: function () {
 
-            console.warn('Three.OrbitControls: .noZoom has been deprecated. Use .enableZoom instead.');
+            console.warn('OrbitControls: .noZoom has been deprecated. Use .enableZoom instead.');
             return !this.enableZoom;
 
         },
 
         set: function (value) {
 
-            console.warn('Three.OrbitControls: .noZoom has been deprecated. Use .enableZoom instead.');
+            console.warn('OrbitControls: .noZoom has been deprecated. Use .enableZoom instead.');
             this.enableZoom = !value;
 
         }
@@ -960,14 +960,14 @@ Object.defineProperties(Three.OrbitControls.prototype, {
 
         get: function () {
 
-            console.warn('Three.OrbitControls: .noRotate has been deprecated. Use .enableRotate instead.');
+            console.warn('OrbitControls: .noRotate has been deprecated. Use .enableRotate instead.');
             return !this.enableRotate;
 
         },
 
         set: function (value) {
 
-            console.warn('Three.OrbitControls: .noRotate has been deprecated. Use .enableRotate instead.');
+            console.warn('OrbitControls: .noRotate has been deprecated. Use .enableRotate instead.');
             this.enableRotate = !value;
 
         }
@@ -978,14 +978,14 @@ Object.defineProperties(Three.OrbitControls.prototype, {
 
         get: function () {
 
-            console.warn('Three.OrbitControls: .noPan has been deprecated. Use .enablePan instead.');
+            console.warn('OrbitControls: .noPan has been deprecated. Use .enablePan instead.');
             return !this.enablePan;
 
         },
 
         set: function (value) {
 
-            console.warn('Three.OrbitControls: .noPan has been deprecated. Use .enablePan instead.');
+            console.warn('OrbitControls: .noPan has been deprecated. Use .enablePan instead.');
             this.enablePan = !value;
 
         }
@@ -996,14 +996,14 @@ Object.defineProperties(Three.OrbitControls.prototype, {
 
         get: function () {
 
-            console.warn('Three.OrbitControls: .noKeys has been deprecated. Use .enableKeys instead.');
+            console.warn('OrbitControls: .noKeys has been deprecated. Use .enableKeys instead.');
             return !this.enableKeys;
 
         },
 
         set: function (value) {
 
-            console.warn('Three.OrbitControls: .noKeys has been deprecated. Use .enableKeys instead.');
+            console.warn('OrbitControls: .noKeys has been deprecated. Use .enableKeys instead.');
             this.enableKeys = !value;
 
         }
@@ -1014,14 +1014,14 @@ Object.defineProperties(Three.OrbitControls.prototype, {
 
         get: function () {
 
-            console.warn('Three.OrbitControls: .staticMoving has been deprecated. Use .enableDamping instead.');
+            console.warn('OrbitControls: .staticMoving has been deprecated. Use .enableDamping instead.');
             return !this.enableDamping;
 
         },
 
         set: function (value) {
 
-            console.warn('Three.OrbitControls: .staticMoving has been deprecated. Use .enableDamping instead.');
+            console.warn('OrbitControls: .staticMoving has been deprecated. Use .enableDamping instead.');
             this.enableDamping = !value;
 
         }
@@ -1032,14 +1032,14 @@ Object.defineProperties(Three.OrbitControls.prototype, {
 
         get: function () {
 
-            console.warn('Three.OrbitControls: .dynamicDampingFactor has been renamed. Use .dampingFactor instead.');
+            console.warn('OrbitControls: .dynamicDampingFactor has been renamed. Use .dampingFactor instead.');
             return this.dampingFactor;
 
         },
 
         set: function (value) {
 
-            console.warn('Three.OrbitControls: .dynamicDampingFactor has been renamed. Use .dampingFactor instead.');
+            console.warn('OrbitControls: .dynamicDampingFactor has been renamed. Use .dampingFactor instead.');
             this.dampingFactor = value;
 
         }
@@ -1072,19 +1072,19 @@ export class TopoViewer {
         this.worldHalfDepth = this.worldDepth / 2;
 
         // SCENE SETUP
-        this.scene = new Three.Scene();
-        this.scene.background = new Three.Color(this.backgroundColor);
+        this.scene = new Scene();
+        this.scene.background = new Color(this.backgroundColor);
 
         // CAMERA SETUP
-        this.camera = new Three.PerspectiveCamera(60, this.width / this.height, 10, 20000);
+        this.camera = new PerspectiveCamera(60, this.width / this.height, 10, 20000);
 
         // RENDERER SETUP
-        this.renderer = new Three.WebGLRenderer();
+        this.renderer = new WebGLRenderer();
         this.renderer.setSize(this.width, this.height);
         this.container.appendChild(this.renderer.domElement);
 
         // CONTROL SETUP
-        this.controls = new Three.OrbitControls(this.camera, this.renderer.domElement);
+        this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.controls.minDistance = 100;
         this.controls.maxDistance = 10000;
         this.controls.maxPolarAngle = Math.PI / 2;
@@ -1101,17 +1101,17 @@ export class TopoViewer {
         // this.mouse = new Three.Vector2();
 
         // PLANE GEOMETRY
-        this.geometry = new Three.PlaneBufferGeometry(this.planeWidth, this.planeHeight, this.worldWidth - 1, this.worldDepth - 1);
+        this.geometry = new PlaneBufferGeometry(this.planeWidth, this.planeHeight, this.worldWidth - 1, this.worldDepth - 1);
         this.geometry.attributes.position.dynamic = true;
         this.geometry.rotateX(- Math.PI / 2);
 
         // TEXTURE
-        this.texture1 = new Three.TextureLoader().load(this.textureURL);
-        
+        this.texture1 = new TextureLoader().load(this.textureURL);
+
         // MATERIAL
         this.materials = [];
-        this.materials.push(new Three.MeshNormalMaterial());
-        this.materials.push(new Three.MeshBasicMaterial({ map: this.texture1 }));
+        this.materials.push(new MeshNormalMaterial());
+        this.materials.push(new MeshBasicMaterial({ map: this.texture1 }));
 
         this.currMaterial = 0;
         this.material = this.materials[this.currMaterial];
@@ -1119,14 +1119,14 @@ export class TopoViewer {
         this.cycleMaterial = () => {
             this.currMaterial = (this.currMaterial < this.materials.length - 1) ? this.currMaterial + 1 : 0;
             console.log('current material changed to ' + this.currMaterial);
-            
+
             this.material = this.materials[this.currMaterial];
             this.mesh.material = this.materials[this.currMaterial];
             this.render();
         }
 
         // MESH
-        this.mesh = new Three.Mesh(this.geometry, this.material);
+        this.mesh = new Mesh(this.geometry, this.material);
         this.scene.add(this.mesh);
 
         // ANNIMATION
@@ -1190,7 +1190,7 @@ export class TopoViewer {
 
     // Updated the Plane Geometry
     updateGeometry(heightData) {
-        
+
         let vertices = this.geometry.attributes.position.array;
 
         for (let i = 0, j = 0, l = vertices.length; i < l; i++ , j += 3) {
@@ -1207,9 +1207,9 @@ export class TopoViewer {
 
         var canvas, canvasScaled, context, image, imageData, vector3, sun, shade;
 
-        vector3 = new Three.Vector3(0, 0, 0);
+        vector3 = new Vector3(0, 0, 0);
 
-        sun = new Three.Vector3(1, 1, 1);
+        sun = new Vector3(1, 1, 1);
         sun.normalize();
 
         canvas = document.createElement('canvas');
@@ -1271,12 +1271,12 @@ export class TopoViewer {
         // image = this.inputImage;
         let texture;
         if (this.isBakedLighting) {
-            texture = new Three.CanvasTexture(this.generateBakedTexture(data, this.worldWidth, this.worldDepth));
+            texture = new CanvasTexture(this.generateBakedTexture(data, this.worldWidth, this.worldDepth));
         } else {
-            texture = new Three.Texture(image);
+            texture = new Texture(image);
         }
-        texture.wrapS = Three.ClampToEdgeWrapping;
-        texture.wrapT = Three.ClampToEdgeWrapping;
+        texture.wrapS = ClampToEdgeWrapping;
+        texture.wrapT = ClampToEdgeWrapping;
 
         return texture;
     }
@@ -1306,3 +1306,9 @@ export class TopoViewer {
     }
 
 }
+
+
+// function newFunction() {
+//     return *;
+// }
+
