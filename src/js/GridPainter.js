@@ -23,7 +23,7 @@ class GridColor {
     }
 
     static add(color1, color2) {
-        return Color.clamp(new GridColor({
+        return GridColor.clamp(new GridColor({
             r: color1.r + color2.r,
             g: color1.r + color2.g,
             b: color1.r + color2.b,
@@ -31,7 +31,7 @@ class GridColor {
     }
     // Returns the differnece in Color between low and high
     static diff(high, low) {
-        return Color.clamp(new GridColor({
+        return GridColor.clamp(new GridColor({
             r: high.r - low.r,
             g: high.g - low.g,
             b: high.b - low.b
@@ -51,7 +51,7 @@ class GridColor {
     }
 
     static clamp(color) {
-        let newColor = Color.copy(color);
+        let newColor = GridColor.copy(color);
         if (newColor.r < 0) newColor.r = 0;
         if (newColor.g < 0) newColor.g = 0;
         if (newColor.b < 0) newColor.b = 0;
@@ -70,16 +70,15 @@ class GridColor {
             return [new GridColor()];
             // If number of colors is 1 return low
         } else if (numColors === 1) {
-            return low;
+            return [low];
         } else {
-            low = Color
-            const colorDiff = Color.clamp(Color.diff(high, low));
+            const colorDiff = GridColor.clamp(GridColor.diff(high, low));
 
             const colorInterval = [];
-            const colorStep = Color.copy(low);
+            let colorStep = GridColor.copy(low);
             for (let i = 0; i < numColors; i++) {
-                colorInterval.push(Color.copy(colorStep));
-                colorStep = Color.add(colorStep, colorDiff);
+                colorInterval.push(GridColor.copy(colorStep));
+                colorStep = GridColor.add(colorStep, colorDiff);
             }
             if (numColors === colorInterval.length) {
                 return colorInterval;
@@ -95,7 +94,7 @@ class GridCell {
         this.colorIndex = initialColorIndex;
         this.color = this.colors[this.colorIndex];
         setPosition(index, params.divs, params.width, params.height);
-        
+
         // Used for advancing in different directions
         this.advance = true;
     }
@@ -179,29 +178,32 @@ export class GridPainter {
 
     constructor(params) {
         // GRID PAINTER CONFIG PARAMS
-        this.container = params.container || document.createElement('div');
-        this.container.className = params.containerClassName || this.container.className;
-        this.canvas = params.canvas || document.createElement('canvas');
-        this.canvas.className = params.canvasClassName || this.canvasClassName;
-        this.canvas.width = params.width || 512;
-        this.canvas.height = params.height || 512;
-        this.divisions = params.divisions || 16;
+        this.container = (params.container !== undefined) ? params.container : document.createElement('div');
+        this.container.className = (params.containerClassName !== undefined) ? params.containerClassName : this.container.className;
+        this.canvas = (params.canvas !== undefined) ? params.canvas : document.createElement('canvas');
+        this.canvas.className = (params.canvasClassName !== undefined) ? params.canvasClassName : this.canvasClassName;
+        this.canvas.width = (params.width !== undefined) ? params.width : 512;
+        this.canvas.height = (params.height !== undefined) ? params.height : 512;
+        this.divisions = (params.divisions !== undefined) ? params.divisions : 16;
 
         // External callbacks that can be registered for Events created by the class
         // The GridPainter object will be passed into the callback arguments along with the originial event.
-        this.callbacks = param.callbacks || {};
+        this.callbacks = (params.callbacks !== undefined) ? params.callbacks : {};
+        this.numColors = Array.isArray(params.colors) ? params.colors.length : (params.numColors || 2);
+        this.colorLow = params.colorLow ? new GridColor(params.colorLow) : new GridColor({ r: 12, g: 12, b: 12 });
+        this.colorHigh = params.colorHigh ? new GridColor(params.colorHigh) : new GridColor({ r: 240, g: 240, b: 240 });
+        this.startColor = (params.startColor !== undefined) ? params.startColor : 0;
+        this.colors = Array.isArray(params.colors) ? params.colors.map((color) => { return new GridColor(color); }) : GridColor.interval(this.colorLow, this.colorHigh, this.numColors);
 
-        this.numColors = params.numColors || 2;
-        this.colorLow = new GridColor(params.colorLow) || new GridColor({ r: 12, g: 12, b: 12 });
-        this.colorHigh = new GridColor(params.colorHigh) || new GridColor({ r: 240, g: 240, b: 240 });
-        this.startColor = params.startColor || 0;
-        this.colors = params.colors.map((color) => { return new GridColor(color); }) || Color.interval(this.colorLow, this.colorHigh, this.numColors);
+        console.log(this.colors);
 
-        this.initPattern = params.initPattern || 'alternate';
+        this.initPattern = (params.initPattern !== undefined) ? params.initPattern : 'alternate';
+
+        console.log(this.initPattern);
 
         // SETUP DRAWING CANVAS
         this.container.appendChild(this.canvas);
-        this.canvas.gridPainter = this; // Attatch the canvas to the grid
+        this.canvas.gridPainter = this; // TODO Attatch the canvas to the grid ??? 
         this.context = this.canvas.getContext('2d');
 
         this.cellWidth = this.canvas.width / this.divisions;
@@ -216,11 +218,13 @@ export class GridPainter {
 
         this.cells = this.setPattern(this.initPattern);
 
+        console.log(this.cells);
+
 
         // TODO -------------------------------------------------------------------
 
         // SETUP EVENT HANDLERS
-        setupEventHandlers();
+        this.setupEventHandlers();
 
         // RENDER ALL CELLS
         this.renderAllCells();
@@ -259,7 +263,11 @@ export class GridPainter {
     // TODO - Add patterns to this
     // Set the Cells to different patterns
     setPattern(pattern) {
+        // Create a new Array 
         let cells = new Array(this.divisions * this.divisions);
+        for (let i = 0; i < cells.length; i++) {
+            cells.push(new GridCell(i, this.startColor, this.gridParams));
+        }
 
         // TODO move to switch-case...
         if (pattern === 'alternate') {

@@ -33190,7 +33190,7 @@ exports.SceneUtils = SceneUtils;
 function LensFlare() {
   console.error('THREE.LensFlare has been moved to /examples/js/objects/Lensflare.js');
 }
-},{}],"js/TopoViewer.js":[function(require,module,exports) {
+},{}],"src/js/TopoViewer.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34149,7 +34149,7 @@ function () {
 }();
 
 exports.TopoViewer = TopoViewer;
-},{"three":"node_modules/three/build/three.module.js"}],"js/GridPainter.js":[function(require,module,exports) {
+},{"three":"node_modules/three/build/three.module.js"}],"src/js/GridPainter.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -34557,7 +34557,7 @@ function () {
 }();
 
 exports.GridPainter = GridPainter;
-},{}],"js/index.js":[function(require,module,exports) {
+},{}],"src/js/index.js":[function(require,module,exports) {
 "use strict";
 
 var Viewer = _interopRequireWildcard(require("../js/TopoViewer.js"));
@@ -34708,7 +34708,7 @@ window.terraGrid.init = function () {
     }
   }
 };
-},{"../js/TopoViewer.js":"js/TopoViewer.js","../js/GridPainter.js":"js/GridPainter.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"../js/TopoViewer.js":"src/js/TopoViewer.js","../js/GridPainter.js":"src/js/GridPainter.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -34877,5 +34877,5 @@ function hmrAccept(bundle, id) {
     return hmrAccept(global.parcelRequire, id);
   });
 }
-},{}]},{},["node_modules/parcel-bundler/src/builtins/hmr-runtime.js","js/index.js"], null)
-//# sourceMappingURL=/js.00a46daa.map
+},{}]},{},["node_modules/parcel-bundler/src/builtins/hmr-runtime.js","src/js/index.js"], null)
+//# sourceMappingURL=/js.d818e0ef.map

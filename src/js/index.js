@@ -57,8 +57,10 @@ window.terraGrid.init = () => {
         container: painterContainer,
         width: window.terrawidth,
         height: window.terrawidth,
-        divisions: 16,
-        numColors: 8,
+        divisions: 8,
+        numColors: 0,
+        colorLow: {r: 30, g: 12, b: 26},
+        colorHigh: {r: 240, g: 240, b: 240},
 
         callback: {
             onclick: (gridPainter, event) => { return false }
@@ -90,9 +92,9 @@ window.terraGrid.init = () => {
         window.topoModel.stopAnimate();
     }
 
-    selectedImage.onclick = () => {
-        window.topoModel.cycleMaterial();
-    }
+    // selectedImage.onclick = () => {
+    //     window.topoModel.cycleMaterial();
+    // }
 
     let index = 0;
     for (let imageURL of window.terraGrid.imageURLs) {
