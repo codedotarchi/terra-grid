@@ -1,14 +1,19 @@
 // import * as React from 'react';
 // import ReactDOM from 'react-dom';
 // import * as Terra from '../components/ui.components.jsx'
+import '@babel/polyfill';
+import * as Viewer from '../js/TopoViewer.js';
+import * as Painter from '../js/GridPainter.js';
+import * as tf from '../lib/tf.min.js';
 
-import * as Viewer from '../js/TopoViewer.js'
-import * as Painter from '../js/GridPainter.js'
+console.log(tf.getBackend());
 
 // Error Message
 // if (WEBGL.isWebGLAvailable() === false) {
 //     document.body.appendChild(WEBGL.getWebGLErrorMessage());
 // }
+// Default Width/Height
+window.terrawidth = 800; // TODO - Set to determine this on windowSize
 
 // Global APp namespace
 window.terraGrid = {};
@@ -29,13 +34,69 @@ window.terraGrid.images = window.terraGrid.imageURLs.map((imageURL) => {
     return image;
 });
 
-// Default Width/Height
-window.terrawidth = 500;
+// MODEL SELECT BUTTONS
+let modelNames = ['256_grid8_bin',
+    '256_grid8_grad',
+    '256_grid16_bin',
+    '256_grid16_grad'];
+
+window.modelButtons = [];
+
+// Loads the Model from this button
+async function loadModel(button) {
+    button.className = 'tab model downloading';
+    await tf.loadLayersModel(button.modelPath).then((model) => {
+        button.model = model;
+        button.isLoaded = true;
+        button.className = 'tab model downloaded';
+    }, (error) => {
+        console.log('fuckThis: ' + error);
+    });
+}
+
+// Set this Button's Model to the current active Model
+function setActiveModel(button) {
+    // Set all Buttons to inactive except this button
+    for (let i = 0; i < window.modelButtons.length; i++) {
+        // Set Inactive
+        if (window.modelButtons[i].className === 'tab model downloaded active') {
+            window.modelButtons[i].className = 'tab model downloaded';
+        }
+    }
+    button.className = 'tab model downloaded active';
+
+    window.activeModel = button.model;
+}
+
 
 window.terraGrid.init = () => {
+    // Set up Model Buttons
+    for (let i = 0; i < modelNames.length; i++) {
+
+        let modelPath = '../models/' + modelNames[i] + '_tfjs/model.json';
+        let modelButton = document.getElementById(modelNames[i]);
+
+        //Set up model Buttons
+        window.modelButtons.push(modelButton);
+        modelButton.isLoaded = false;
+        modelButton.modelPath = modelPath;
+
+        modelButton.onclick = function () {
+            if (this.isLoaded) {
+                // Load the Model
+                setActiveModel(this);
+            } else {
+                loadModel(this);
+            }
+        };
+    }
+
     const mainContainer = document.getElementById('mainContainer');
     const painterContainer = document.createElement('div');
+
     painterContainer.style.float = 'left';
+    painterContainer.style.border = '2px solid #3e3e3e';
+
     const selectedImage = document.createElement('img');
     selectedImage.style.width = window.terrawidth + 'px';
     selectedImage.style.float = 'left';
@@ -50,26 +111,8 @@ window.terraGrid.init = () => {
     // mainContainer.appendChild(imageSelectorContainer);
     mainContainer.appendChild(canvasContainer);
 
-    
-    // GRID SELECTOR
-    //----------------------------------------------------
-    window.gridPainter = new Painter.GridPainter({
-        container: painterContainer,
-        width: window.terrawidth,
-        height: window.terrawidth,
-        divisions: 8,
-        numColors: 0,
-        colorLow: {r: 30, g: 12, b: 26},
-        colorHigh: {r: 240, g: 240, b: 240},
-
-        callback: {
-            onclick: (gridPainter, event) => { return false }
-        }
-    });
-
-
     // TOPO VIEWER
-    //-----------------------------------------------------
+    // -----------------------------------------------------
     window.topoModel = new Viewer.TopoViewer({
         container: canvasContainer,
         backgroundColor: 0x1e1e1e,
@@ -84,65 +127,32 @@ window.terraGrid.init = () => {
         window.topoModel.isAnimating = true;
         window.topoModel.animate();
         // console.log('ANNIMATION STARTED');
-    }
+    };
 
     canvasContainer.onmouseout = () => {
         // console.log('MOUSE EXIT');
         window.topoModel.isAnimating = false;
         window.topoModel.stopAnimate();
-    }
+    };
 
-    // selectedImage.onclick = () => {
-    //     window.topoModel.cycleMaterial();
-    // }
+    // GRID SELECTOR
+    //----------------------------------------------------
+    window.gridPainter = new Painter.GridPainter({
+        container: painterContainer,
+        width: window.terrawidth,
+        height: window.terrawidth,
+        divisions: 8,
+        numColors: 4,
+        colorLow: { r: 30, g: 30, b: 30 },
+        colorHigh: { r: 250, g: 250, b: 250 },
 
-    let index = 0;
-    for (let imageURL of window.terraGrid.imageURLs) {
-
-        let image = document.createElement('img');
-        image.dataset.index = index;
-        image.src = imageURL;
-        image.style.width = window.terrawidth / window.terraGrid.imageURLs.length + 'px';
-        image.style.display = 'block';
-
-        image.onclick = function () {
-
-            // Set the current image pointer and update the image display panel
-            window.currImage = window.terraGrid.images[parseInt(this.dataset.index)];
-            selectedImage.src = window.terraGrid.imageURLs[parseInt(this.dataset.index)];
-
-            window.topoModel.updateModel(window.currImage);
+        callbacks: {
+            onclickCallback: (gridPainter, event) => {
+                // TODO - This is where the TF update takes place
+                window.topoModel.updateModel(gridPainter.getImageDataResample(256, 256));
+            }
         }
-
-        imageSelectorContainer.appendChild(image);
-
-        index++;
-    }
+    });
 
 
-    // Code to run on document load
-    
-    // const body = document.getElementById('bodyContainer');
-    // const testContainer = document.getElementById('testContainer');
-
-
-    // const imageURL = window.terraGrid.imageURLs[window.terraGrid.currImageIndex];
-    
-    // const inputImage = new Image();
-    // inputImage.src = imageURL;
-    // imgContainer.appendChild(inputImage);
-
-    // const params = {
-        
-    // };
-
-    // window.topoViewer = new Viewer.TopoViewer(params);
-    // window.topoViewer.attatchTo(testContainer);
-
-    // window.topoViewer.updateModel();
-
-    // inputImage.onload = () => {window.topoViewer.updateModel(inputImage);}
-    // window.topoViewer.animate(window.topoViewer);
-
-    // window.rtree = ReactDOM.render(<Terra.TopoViewPort3d imageURL={imageURL} params={params} />, body);
-}
+};

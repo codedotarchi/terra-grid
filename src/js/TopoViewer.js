@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 import { Scene, Vector2, Vector3, MOUSE, Quaternion, Spherical, Color, PerspectiveCamera, WebGLRenderer, PlaneBufferGeometry, TextureLoader, MeshNormalMaterial, MeshBasicMaterial, Mesh, ClampToEdgeWrapping, CanvasTexture, Texture, EventDispatcher } from 'three';
 
 var OrbitControls = function (object, domElement) {
@@ -531,27 +532,22 @@ var OrbitControls = function (object, domElement) {
         event.preventDefault();
 
         switch (event.keyCode) {
-
             case scope.keys.UP:
                 pan(0, scope.keyPanSpeed);
                 scope.update();
                 break;
-
             case scope.keys.BOTTOM:
                 pan(0, - scope.keyPanSpeed);
                 scope.update();
                 break;
-
             case scope.keys.LEFT:
                 pan(scope.keyPanSpeed, 0);
                 scope.update();
                 break;
-
             case scope.keys.RIGHT:
                 pan(- scope.keyPanSpeed, 0);
                 scope.update();
                 break;
-
         }
 
     }
@@ -1063,7 +1059,7 @@ export class TopoViewer {
         this.planeWidth = params.planeWidth || 7500;
         this.planeHeight = params.planeHeight || 7500;
         this.heightScale = params.heightScale || 10;
-        this.textureURL = params.textureURL || '../test/img/defaultTopoViewerTexture.png'
+        this.textureURL = params.textureURL || '../test/img/defaultTopoViewerTexture.png';
         this.isAnimating = false;
         this.annimationId;
 
@@ -1123,7 +1119,7 @@ export class TopoViewer {
             this.material = this.materials[this.currMaterial];
             this.mesh.material = this.materials[this.currMaterial];
             this.render();
-        }
+        };
 
         // MESH
         this.mesh = new Mesh(this.geometry, this.material);
@@ -1133,12 +1129,12 @@ export class TopoViewer {
         this.animate = () => {
             this.annimationId = requestAnimationFrame(this.animate);
             this.render();
-        }
+        };
 
         this.stopAnimate = () => {
             cancelAnimationFrame(this.annimationId);
             // console.log('ANNIMATION STOPED');
-        }
+        };
 
     }
 
@@ -1147,12 +1143,12 @@ export class TopoViewer {
 
     // Get the Render Canvas
     getDOMElement() {
-        return this.renderer.domElement
+        return this.renderer.domElement;
     }
 
     // Sets the input image
     setInputImage(inputURL) {
-        this.inputImage.src = newInputURL;
+        this.inputImage.src = inputURL;
     }
 
     // Sets the Height Data
@@ -1172,20 +1168,23 @@ export class TopoViewer {
         context.drawImage(img, 0, 0);
 
         for (var i = 0; i < size; i++) {
-            data[i] = 0
+            data[i] = 0;
         }
 
         var pix = context.getImageData(0, 0, img.width, img.height).data;
 
+        return this.averageHeightData(pix, scale);
+
+    }
+
+    averageHeightData(pix, scale) {
+        let data = new Uint8Array(pix.length / 4);
         var j = 0;
         for (var i = 0; i < pix.length; i += 4) {
             var all = pix[i] + pix[i + 1] + pix[i + 2];
             data[j++] = all / (3 * scale);
-
         }
-        // console.log(data);
         return data;
-
     }
 
     // Updated the Plane Geometry
@@ -1282,9 +1281,12 @@ export class TopoViewer {
     }
 
     // Updates the Model Geometry and Rendering
-    updateModel(image) {
+    updateModel(input) {
+        let scale = 1; // TODO fix this
         // setInputImage(inputURL);
-        const data = this.getHeightData(image)
+        // const data = this.getHeightData(image);
+
+        const data = this.averageHeightData(input, scale);
         this.updateGeometry(data);
 
         // Optional --- ????
