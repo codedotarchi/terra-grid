@@ -1049,6 +1049,7 @@ Object.defineProperties(Three.OrbitControls.prototype, {
 });
 
 export class TopoViewer {
+
     constructor(params) {
         // TOPO VIEWER CONFIG PARAMS
         this.container = params.container || document.createElement('div');
@@ -1062,6 +1063,7 @@ export class TopoViewer {
         this.planeWidth = params.planeWidth || 7500;
         this.planeHeight = params.planeHeight || 7500;
         this.heightScale = params.heightScale || 10;
+        this.textureURL = params.textureURL || '../test/img/defaultTopoViewerTexture.png'
         this.isAnimating = false;
         this.annimationId;
 
@@ -1079,6 +1081,7 @@ export class TopoViewer {
         // RENDERER SETUP
         this.renderer = new Three.WebGLRenderer();
         this.renderer.setSize(this.width, this.height);
+        this.container.appendChild(this.renderer.domElement);
 
         // CONTROL SETUP
         this.controls = new Three.OrbitControls(this.camera, this.renderer.domElement);
@@ -1097,27 +1100,36 @@ export class TopoViewer {
         // this.raycaster = new Three.Raycaster();
         // this.mouse = new Three.Vector2();
 
-        // PLANE Geometry
+        // PLANE GEOMETRY
         this.geometry = new Three.PlaneBufferGeometry(this.planeWidth, this.planeHeight, this.worldWidth - 1, this.worldDepth - 1);
         this.geometry.attributes.position.dynamic = true;
         this.geometry.rotateX(- Math.PI / 2);
 
         // TEXTURE
-        var data = new Uint8Array(3 * 256 * 256);
-        for (var i = 0; i < data.length; i++) {
-            data[i] = Math.random() * 255;
-        }
-
+        this.texture1 = new Three.TextureLoader().load(this.textureURL);
+        
         // MATERIAL
-        this.material = new Three.MeshNormalMaterial();
-        // this.texture = new Three.DataTexture(data, 256, 256, Three.RGBFormat);
-        // this.material = new Three.MeshBasicMaterial({ map: this.texture });
+        this.materials = [];
+        this.materials.push(new Three.MeshNormalMaterial());
+        this.materials.push(new Three.MeshBasicMaterial({ map: this.texture1 }));
+
+        this.currMaterial = 0;
+        this.material = this.materials[this.currMaterial];
+
+        this.cycleMaterial = () => {
+            this.currMaterial = (this.currMaterial < this.materials.length - 1) ? this.currMaterial + 1 : 0;
+            console.log('current material changed to ' + this.currMaterial);
+            
+            this.material = this.materials[this.currMaterial];
+            this.mesh.material = this.materials[this.currMaterial];
+            this.render();
+        }
 
         // MESH
         this.mesh = new Three.Mesh(this.geometry, this.material);
         this.scene.add(this.mesh);
 
-        // Run the Animation Loop if Viewer is Animating
+        // ANNIMATION
         this.animate = () => {
             this.annimationId = requestAnimationFrame(this.animate);
             this.render();
@@ -1178,27 +1190,15 @@ export class TopoViewer {
 
     // Updated the Plane Geometry
     updateGeometry(heightData) {
-        // heightData = this.heightData;
-
-        // this.geometry = new Three.PlaneBufferGeometry(this.planeWidth, this.planeHeight, this.worldWidth - 1, this.worldDepth - 1);
-        // this.geometry.rotateX(- Math.PI / 2);
-
-
+        
         let vertices = this.geometry.attributes.position.array;
-
-
 
         for (let i = 0, j = 0, l = vertices.length; i < l; i++ , j += 3) {
             vertices[j + 1] = heightData[i] * this.heightScale;
         }
 
-        console.log(vertices);
-
-        // this.geometry.attributes.position.array = vertices;
         this.geometry.attributes.position.needsUpdate = true;
         this.geometry.computeVertexNormals();
-
-
     }
 
     // Generate the Canvas for a bAked Texture
@@ -1286,17 +1286,18 @@ export class TopoViewer {
         // setInputImage(inputURL);
         const data = this.getHeightData(image)
         this.updateGeometry(data);
-        // this.controls.target.y = data[this.worldHalfWidth + this.worldHalfDepth * this.worldWidth] + 500;
+
+        // Optional --- ????
+        this.controls.target.y = data[this.worldHalfWidth + this.worldHalfDepth * this.worldWidth] + 500;
+
         // this.texture = this.buildTexture(data, image);
-        console.log(this);
+        // console.log(this);
         this.render();
-
-        // // TODO: Maybe we don't need this?
-
     }
 
+
     attatchTo(container) {
-        container.appendChild(this.getDOMElement());
+        container.appendChild(this.container);
     }
 
     // Render the Scene and Camera

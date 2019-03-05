@@ -1,26 +1,26 @@
 // import * as React from 'react';
 // import ReactDOM from 'react-dom';
 // import * as Terra from '../components/ui.components.jsx'
+
 import * as Viewer from '../js/TopoViewer.js'
+import * as Painter from '../js/GridPainter.js'
 
 // Error Message
 // if (WEBGL.isWebGLAvailable() === false) {
 //     document.body.appendChild(WEBGL.getWebGLErrorMessage());
 // }
 
-
 // Global APp namespace
 window.terraGrid = {};
 
-// Test Image
+// Test Images
 window.terraGrid.currImageIndex = 0;
 window.terraGrid.imageURLs = ['./test/img/1-outputs.png',
-    '../test/img/2-outputs.png',
-    '../test/img/3-outputs.png',
-    '../test/img/4-outputs.png',
-    '../test/img/5-outputs.png',
-    '../test/img/6-outputs.png'];
-
+    './test/img/2-outputs.png',
+    './test/img/3-outputs.png',
+    './test/img/4-outputs.png',
+    './test/img/5-outputs.png',
+    './test/img/6-outputs.png'];
 window.terraGrid.images = window.terraGrid.imageURLs.map((imageURL) => {
     let image = document.createElement('img');
     image.src = imageURL;
@@ -29,35 +29,45 @@ window.terraGrid.images = window.terraGrid.imageURLs.map((imageURL) => {
     return image;
 });
 
-
-
-
-
-// for (let imageURL of window.terraGrid.imageURLs) {
-// }
-
+// Default Width/Height
 window.terrawidth = 500;
 
 window.terraGrid.init = () => {
-    const imgContainer = document.getElementById('imageContainer');
-    
-    let index = 0;
-
+    const mainContainer = document.getElementById('mainContainer');
+    const painterContainer = document.createElement('div');
+    painterContainer.style.float = 'left';
     const selectedImage = document.createElement('img');
     selectedImage.style.width = window.terrawidth + 'px';
     selectedImage.style.float = 'left';
-
-    const imageSelectorContainer = document.createElement('div');
-    imageSelectorContainer.style.float = 'left';
-
+    // const imageSelectorContainer = document.createElement('div');
+    // imageSelectorContainer.style.float = 'left';
     const canvasContainer = document.createElement('div');
     canvasContainer.style.float = 'left';
 
     // Add to document
-    imgContainer.appendChild(selectedImage);
-    imgContainer.appendChild(imageSelectorContainer);
-    imgContainer.appendChild(canvasContainer);
+    mainContainer.appendChild(painterContainer);
+    mainContainer.appendChild(selectedImage);
+    // mainContainer.appendChild(imageSelectorContainer);
+    mainContainer.appendChild(canvasContainer);
 
+    
+    // GRID SELECTOR
+    //----------------------------------------------------
+    window.gridPainter = new Painter.GridPainter({
+        container: painterContainer,
+        width: window.terrawidth,
+        height: window.terrawidth,
+        divisions: 16,
+        numColors: 8,
+
+        callback: {
+            onclick: (gridPainter, event) => { return false }
+        }
+    });
+
+
+    // TOPO VIEWER
+    //-----------------------------------------------------
     window.topoModel = new Viewer.TopoViewer({
         container: canvasContainer,
         backgroundColor: 0x1e1e1e,
@@ -80,9 +90,11 @@ window.terraGrid.init = () => {
         window.topoModel.stopAnimate();
     }
 
+    selectedImage.onclick = () => {
+        window.topoModel.cycleMaterial();
+    }
 
-    window.topoModel.attatchTo(canvasContainer);
-
+    let index = 0;
     for (let imageURL of window.terraGrid.imageURLs) {
 
         let image = document.createElement('img');
@@ -92,7 +104,7 @@ window.terraGrid.init = () => {
         image.style.display = 'block';
 
         image.onclick = function () {
-            
+
             // Set the current image pointer and update the image display panel
             window.currImage = window.terraGrid.images[parseInt(this.dataset.index)];
             selectedImage.src = window.terraGrid.imageURLs[parseInt(this.dataset.index)];
@@ -104,11 +116,6 @@ window.terraGrid.init = () => {
 
         index++;
     }
-
-    
-
-
-
 
 
     // Code to run on document load
