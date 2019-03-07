@@ -193,7 +193,8 @@ class GridCell {
 
 }
 
-export class GridPainter {
+// TODO add export
+class GridPainter {
 
     constructor(params) {
         // GRID PAINTER CONFIG PARAMS
@@ -408,7 +409,7 @@ export class GridPainter {
             }
         }
 
-        return data2;
+        return img2;
         // //clear and resize canvas
         // if (resize_canvas === true) {
         //     canvas.width = width;

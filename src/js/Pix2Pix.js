@@ -1,4 +1,5 @@
-import * as tf from './tf.min.js';
+// import * as tf from './tf.min.js';
+let tf = require('@tensorflow/tfjs');
 
 console.log(tf.getBackend());
 // window.gan = new Pix2Pix([256, 256, 3], 32);
@@ -47,6 +48,7 @@ class Pix2Pix {
         //     optimizer = optimizer,
         //     metrics = ['accuracy'])
         this.discriminator = this.buildDiscriminator();
+        // this.discriminator.summary();
 
         // #-------------------------
         // # Construct Computational
@@ -57,6 +59,9 @@ class Pix2Pix {
         // self.generator = self.build_generator()
         this.generator = this.buildGenerator();
 
+        // 
+        // this.generator.summary();
+
         // # Input images and their conditioning images
         // img_A = Input(shape = self.img_shape)
         // img_B = Input(shape = self.img_shape)
@@ -65,27 +70,34 @@ class Pix2Pix {
 
         // # By conditioning on B generate a fake version of A
         // fake_A = self.generator(img_B)
-        const fakeA = this.generator(inputB); //????
+        const fakeA = this.generator.apply(inputB); //????
+        // const fakeA = this.generator.getLayer('conv2d_Conv2D19');
 
         // # For the combined model we will only train the generator
         // self.discriminator.trainable = False
 
         // # Discriminators determines validity of translated images / condition pairs
         // valid = self.discriminator([fake_A, img_B])
-        const valid = this.discriminator([fakeA, inputB]); //????
+
+        // console.log(this.discriminator);
+        const valid = this.discriminator.apply([fakeA, inputB]); //????
+        // const valid = this.discriminator.getLayer('conv2d_Conv2D5');
 
         // self.combined = Model(inputs = [img_A, img_B], outputs = [valid, fake_A])
         // self.combined.compile(loss = ['mse', 'mae'],
         //     loss_weights = [1, 100],
         //     optimizer = optimizer)
-        this.combined = tf.Model({ inputs: [img_A, img_B], outputs: [valid, fake_A] });
+        this.combined = tf.model({ inputs: [inputA, inputB], outputs: [valid, fakeA] });
+
+        this.combined.summary();
         this.combined.compile({
-            optimizer: this.optimizer,
-            loss: ['mse', 'mae'],
+            optimizer: this.adam,
+            loss: ['meanSquaredError', 'meanAbsoluteError'],
             lossWeights: [1, 100]
         });
     }
     loadData(imageList) {
+        // tf.losses.bina
 
     }
 
@@ -164,7 +176,7 @@ class Pix2Pix {
         // d6 = conv2d(d5, self.gf * 8)
         // d7 = conv2d(d6, self.gf * 8)
 
-        const d1 = conv2d(d0, this.g_filters, bn = False);
+        const d1 = conv2d(d0, this.g_filters, 4, false);
         const d2 = conv2d(d1, this.g_filters * 2);
         const d3 = conv2d(d2, this.g_filters * 4);
         const d4 = conv2d(d3, this.g_filters * 8);
@@ -236,12 +248,12 @@ class Pix2Pix {
 
         // img_A = Input(shape = self.img_shape)
         // img_B = Input(shape = self.img_shape)
-        input1 = tf.input({ shape: this.imageShape });
-        input2 = tf.input({ shape: this.imageShape });
+        let input1 = tf.input({ shape: this.imageShape });
+        let input2 = tf.input({ shape: this.imageShape });
 
         // # Concatenate image and conditioning image by channels to produce input
         // combined_imgs = Concatenate(axis = -1)([img_A, img_B])
-        combinedImgs = tf.layers.concatenate().apply([input1, input2]);
+        let combinedImgs = tf.layers.concatenate().apply([input1, input2]);
 
         // d1 = d_layer(combined_imgs, self.df, bn = False)
         // d2 = d_layer(d1, self.df * 2)
@@ -249,18 +261,18 @@ class Pix2Pix {
         // d4 = d_layer(d3, self.df * 8)
 
         const d1 = dLayer(combinedImgs, this.d_filters);
-        const d2 = dLayer(d1, this.df * 2);
-        const d3 = dLayer(d2, this.df * 4);
-        const d4 = dLayer(d3, this.df * 8);
+        const d2 = dLayer(d1, this.d_filters * 2);
+        const d3 = dLayer(d2, this.d_filters * 4);
+        const d4 = dLayer(d3, this.d_filters * 8);
 
         // validity = Conv2D(1, kernel_size = 4, strides = 1, padding = 'same')(d4)
         const output = tf.layers.conv2d({
-            inputShape: [28, 28, 1],
+            // inputShape: [28, 28, 1],
             kernelSize: 4,
             filters: 1,
             strides: 1,
             padding: 'same'
-        }).apply(layer_input);
+        }).apply(d4);
 
         // return Model([img_A, img_B], validity)
         return tf.model({ inputs: [input1, input2], outputs: output });
@@ -372,195 +384,7 @@ class Pix2Pix {
     }
 }
 
-// // Drawing Grid
-// class Grid {
-//     constructor(divisions, canvas) {
-//         this.divisions = divisions;
-//         this.cells = new Array(divisions * divisions);
-//         this.canvas = canvas;
-//         this.canvas.gridObj = this;
-//         this.context = canvas.getContext('2d');
+let p2p = new Pix2Pix([256, 256, 1], 32);
 
-//         this.canvas.width = 512;
-//         this.canvas.height = 512;
-
-//         this.cellWidth = this.canvas.width / this.divisions;
-//         this.cellHeight = this.canvas.height / this.divisions;
-
-//         this.colWhite = { val: true, r: 255, g: 255, b: 255 };
-//         this.colBlack = { val: false, r: 0, g: 0, b: 0 };
-
-//         this.clearAllCells(this.colWhite);
-//         this.drawAllCells();
-
-//         this.canvas.onclick = function (e) {
-//             // Get the mouse coords
-//             let coord = {
-//                 x: e.pageX - this.offsetLeft,
-//                 y: e.pageY - this.offsetTop
-//             };
-//             // console.log(coord);
-
-//             // Get cell position, flip the color, and set new value
-//             let pos = this.gridObj.getCellPosition(coord);
-//             // console.log(pos);
-
-//             let col = this.gridObj.flipColor(this.gridObj.getCellCol(pos));
-//             // console.log(col);
-
-//             this.gridObj.setCellValue(pos, col);
-
-//             // Draw the new cell on the canvas
-//             this.gridObj.drawCell(this.gridObj.getCellIndex(pos));
-
-//             // callback(this.getPixelData());
-//         };
-//     }
-
-//     // Flips color between black and white
-//     flipColor(col) {
-//         if (col.val) {
-//             return this.colBlack;
-//         } else {
-//             return this.colWhite;
-//         }
-//     }
-
-//     getCellRect(pos) {
-//         let xPos = Math.floor(this.cellWidth * pos.x);
-//         let yPos = Math.floor(this.cellHeight * pos.y);
-
-//         return { x: xPos, y: yPos, w: this.cellWidth, h: this.cellHeight };
-//     }
-
-//     getCellPosition(coord, from) {
-//         let xPos, yPos;
-//         if (from === 'index') {
-//             let index = coord;
-//             xPos = index % this.divisions;
-//             yPos = Math.floor(index / this.divisions);
-//         } else {
-//             xPos = Math.floor(this.divisions * coord.x / this.canvas.width);
-//             yPos = Math.floor(this.divisions * coord.y / this.canvas.height);
-//         }
-
-//         return { x: xPos, y: yPos };
-
-//     }
-
-//     getCellIndex(pos) {
-//         let index = pos.y * this.divisions + pos.x;
-//         return index;
-
-//     }
-
-//     getCellCol(pos) {
-//         return this.cells[this.getCellIndex(pos)];
-//     }
-
-//     // Set a RGB Val = {r, g, b}
-//     setCellValue(pos, col) {
-//         this.cells[this.getCellIndex(pos)] = col;
-//     }
-
-//     // Clear out all cell values
-//     clearAllCells(col) {
-//         for (let i = 0; i < this.cells.length; i++) {
-//             this.cells[i] = col;
-//         }
-//     }
-
-//     // Draws the cell to the canvas based on index
-//     drawCell(index) {
-//         let col = this.cells[index];
-//         this.context.fillStyle = 'rgb(' + col.r + ',' + col.g + ',' + col.b + ')';
-
-//         let rect = this.getCellRect(this.getCellPosition(index, 'index'));
-//         this.context.fillRect(rect.x, rect.y, rect.w, rect.h);
-//     }
-
-//     // Draws/Redraws all cells
-//     drawAllCells() {
-//         for (let i = 0; i < this.cells.length; i++) {
-//             this.drawCell(i);
-//         }
-//     }
-
-//     // TODO
-//     downloadGrid() {
-//         let grid = {};
-//         grid.divisions = this.divisions;
-//     }
-
-//     // TODO
-//     uploadGrid(divisions, values) {
-
-//     }
-
-// }
-
-
-// TODO - 
-// svaed code from main init:
-
-
-
-
-
-
-    // selectedImage.onclick = () => {
-    //     window.topoModel.cycleMaterial();
-    // }
-
-    // let index = 0;
-    // for (let imageURL of window.terraGrid.imageURLs) {
-
-    //     let image = document.createElement('img');
-    //     image.dataset.index = index;
-    //     image.src = imageURL;
-    //     image.style.width = window.terrawidth / window.terraGrid.imageURLs.length + 'px';
-    //     image.style.display = 'block';
-
-    //     image.onclick = function () {
-
-    //         // Set the current image pointer and update the image display panel
-    //         window.currImage = window.terraGrid.images[parseInt(this.dataset.index)];
-    //         selectedImage.src = window.terraGrid.imageURLs[parseInt(this.dataset.index)];
-
-    //         window.topoModel.updateModel(window.currImage);
-    //     }
-
-    //     imageSelectorContainer.appendChild(image);
-
-    //     index++;
-    // }
-
-
-    // Code to run on document load
-
-    // const body = document.getElementById('bodyContainer');
-    // const testContainer = document.getElementById('testContainer');
-
-
-    // const imageURL = window.terraGrid.imageURLs[window.terraGrid.currImageIndex];
-
-    // const inputImage = new Image();
-    // inputImage.src = imageURL;
-    // imgContainer.appendChild(inputImage);
-
-    // const params = {
-
-    // };
-
-    // window.topoViewer = new Viewer.TopoViewer(params);
-    // window.topoViewer.attatchTo(testContainer);
-
-    // window.topoViewer.updateModel();
-
-    // inputImage.onload = () => {window.topoViewer.updateModel(inputImage);}
-    // window.topoViewer.animate(window.topoViewer);
-
-    // window.rtree = ReactDOM.render(<Terra.TopoViewPort3d imageURL={imageURL} params={params} />, body);
-
-
-
+p2p.discriminator.summary();
+p2p.generator.summary();

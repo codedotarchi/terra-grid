@@ -1,10 +1,12 @@
 <!-- Served @ https://terragrid.z5.web.core.windows.net/ -->
 
-<!-- <!DOCTYPE html> -->
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <link rel="stylesheet" href="./src/css/index.css">
+    <script src='./src/lib/tf.min.js'></script>
+    <script src='./src/js/GridPainter.js'></script>
     <script src='./src/js/index.js'></script>
 </head>
 
@@ -17,6 +19,69 @@
     </div>
 
     <div id='mainContainer'></div>
+    <canvas id='outputImage'></canvas>
+
+
+    <!-- My tfjs Load -->
+    <script>
+        // MODEL SELECT BUTTONS
+        let modelNames = ['256_grid8_bin',
+            '256_grid8_grad',
+            '256_grid16_bin',
+            '256_grid16_grad'];
+
+        window.modelButtons = [];
+
+        // Loads the Model from this button
+        async function loadModel(button) {
+            button.className = 'tab model downloading';
+            await tf.loadLayersModel(button.modelPath).then((model) => {
+                console.log(model);
+                button.model = model;
+                button.isLoaded = true;
+                button.className = 'tab model downloaded';
+            }, (error) => {
+                console.log('fuckThis: ' + error);
+            });
+        }
+
+        // Set this Button's Model to the current active Model
+        function setActiveModel(button) {
+            // Set all Buttons to inactive except this button
+            for (let i = 0; i < window.modelButtons.length; i++) {
+                // Set Inactive
+                if (window.modelButtons[i].className === 'tab model downloaded active') {
+                    window.modelButtons[i].className = 'tab model downloaded';
+                }
+            }
+            button.className = 'tab model downloaded active';
+
+            window.activeModel = button.model;
+        }
+
+        function setupButtons() {
+            // Set up Model Buttons
+            for (let i = 0; i < modelNames.length; i++) {
+
+                let modelPath = './dist/models/' + modelNames[i] + '_tfjs/model.json';
+                let modelButton = document.getElementById(modelNames[i]);
+
+                //Set up model Buttons
+                window.modelButtons.push(modelButton);
+                modelButton.isLoaded = false;
+                modelButton.modelPath = modelPath;
+
+                modelButton.onclick = function () {
+                    if (this.isLoaded) {
+                        // Load the Model
+                        setActiveModel(this);
+                    } else {
+                        loadModel(this);
+                    }
+                };
+            }
+        }
+    </script>
 
     <script>
         window.terraGrid.init();
